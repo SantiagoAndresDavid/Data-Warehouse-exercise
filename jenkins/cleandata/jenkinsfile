@@ -6,7 +6,15 @@ pipeline {
             steps {
                 dir('/jenkins/uperdata/scritps') {
                     sh 'chmod +x create_directories_hdfs.sh'
-                    echo "funciono"
+                    sh './create_directories_hdfs.sh'
+                }
+            }
+        },
+        stage('Import data-set'){
+            steps{
+                dir('/tmp/dataset'){
+                    sh 'chmod +x update_dataset_hdfs.sh'
+                    sh './update_dataset_hdfs.sh'
                 }
             }
         }

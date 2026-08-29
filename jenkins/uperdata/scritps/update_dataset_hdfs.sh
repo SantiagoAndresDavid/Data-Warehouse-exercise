@@ -1,15 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 
+WORKSPACE_DIR="${WORKSPACE:-$(pwd)}"
+DATA_DIR="${WORKSPACE_DIR}/dataset"
 HDFS_PATH="/raw"
-DATA_DIR="/dataset"
 
 echo "================================="
 echo " Subiendo datasets"
 echo "================================="
 
 if [ ! -d "$DATA_DIR" ]; then
-    echo "ERROR: no existe el directorio $DATA_DIR dentro del contenedor Jenkins/namenode."
+    echo "ERROR: no existe el directorio $DATA_DIR en el workspace del pipeline."
     exit 1
 fi
 

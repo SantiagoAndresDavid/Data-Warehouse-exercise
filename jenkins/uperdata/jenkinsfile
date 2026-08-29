@@ -2,11 +2,10 @@ pipeline {
     agent any
 
     stages {
-        stage('Clean Data') {
+        stage('Run') {
             steps {
                 dir('/pipelines/cleandata') {
-                    sh 'ls -la'
-                    sh 'pwd'
+                    sh 'python3 main.py'
                 }
             }
         }

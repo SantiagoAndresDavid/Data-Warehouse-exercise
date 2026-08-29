@@ -1,7 +1,7 @@
 services:
   jenkins:
     image: jenkins/jenkins:lts
-    container_name: jenkins
+    container_name: jenkins-data-warehouse
     user: root
     restart: unless-stopped
 
@@ -14,14 +14,13 @@ services:
 
     volumes:
       - jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
 
     entrypoint:
       - /bin/bash
       - -c
       - |
-        apt-get update
-        apt-get install -y git curl build-essential docker.io
+        apt-get update && \
+        apt-get install -y git curl build-essential docker.io && \
         exec /usr/bin/tini -- /usr/local/bin/jenkins.sh
 
 volumes:

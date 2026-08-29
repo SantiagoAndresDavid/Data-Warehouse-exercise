@@ -1,4 +1,5 @@
 services:
+
   jenkins:
     image: jenkins/jenkins:lts
     container_name: jenkins-data-warehouse
@@ -6,7 +7,7 @@ services:
     restart: unless-stopped
 
     ports:
-      - "8080:8080"
+      - "8081:8080"
       - "50000:50000"
 
     environment:
@@ -14,6 +15,7 @@ services:
 
     volumes:
       - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
 
     entrypoint:
       - /bin/bash
@@ -23,5 +25,12 @@ services:
         apt-get install -y git curl build-essential docker.io && \
         exec /usr/bin/tini -- /usr/local/bin/jenkins.sh
 
+    networks:
+      - bigdata
+
 volumes:
   jenkins_home:
+
+networks:
+  bigdata:
+    external: true

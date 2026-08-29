@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     stages {
-        stage('Clean Data') {
+        stage('Create directories') {
             steps {
-                dir('/pipelines/cleandata') {
-                    sh 'ls -la'
-                    sh 'pwd'
+                dir('/jenkins/uperdata/scritps') {
+                    chmod +x create_directories_hdfs.sh
+                    echo "funciono"
                 }
             }
         }

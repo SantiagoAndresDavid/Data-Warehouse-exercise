@@ -2,7 +2,7 @@
 
 set -e
 
-DATA_DIR="jenkins/dataset"
+DATA_DIR="./jenkins/dataset"
 HDFS_PATH="/raw"
 
 echo "================================="

@@ -12,7 +12,7 @@ pipeline {
         }
         stage('Import data-set'){
             steps{
-                dir('/tmp/dataset'){
+                dir('/jenkins/uperdata/scritps'){
                     sh 'chmod +x update_dataset_hdfs.sh'
                     sh './update_dataset_hdfs.sh'
                 }

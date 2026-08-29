@@ -5,7 +5,7 @@ pipeline {
         stage('Create directories') {
             steps {
                 dir('/jenkins/uperdata/scritps') {
-                    sh chmod +x create_directories_hdfs.sh
+                    sh 'chmod +x create_directories_hdfs.sh'
                     echo "funciono"
                 }
             }

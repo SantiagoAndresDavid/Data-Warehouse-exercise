@@ -4,17 +4,18 @@ pipeline {
     stages {
         stage('Create directories') {
             steps {
-                dir('/jenkins/uperdata/scritps') {
+                dir("${WORKSPACE}/jenkins/uperdata/scritps") {
                     sh 'chmod +x create_directories_hdfs.sh'
                     sh './create_directories_hdfs.sh'
                 }
             }
         }
-        stage('Import data-set'){
-            steps{
-                dir('/jenkins/uperdata/scritps'){
-                    sh 'chmod +x update_dataset_hdfs.sh'
-                    sh './update_dataset_hdfs.sh'
+
+        stage('Import data-set') {
+            steps {
+                dir("${WORKSPACE}") {
+                    sh 'chmod +x jenkins/uperdata/scritps/update_dataset_hdfs.sh'
+                    sh 'bash jenkins/uperdata/scritps/update_dataset_hdfs.sh'
                 }
             }
         }

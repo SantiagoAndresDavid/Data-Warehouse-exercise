@@ -9,7 +9,7 @@ pipeline {
                     sh './create_directories_hdfs.sh'
                 }
             }
-        },
+        }
         stage('Import data-set'){
             steps{
                 dir('/tmp/dataset'){

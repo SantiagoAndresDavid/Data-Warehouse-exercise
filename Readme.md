@@ -86,6 +86,15 @@ Zonas de datos sugeridas:
 - `docker/docker-compose.jenkins.yml` : Stack para Jenkins.
 - `docker/spark-jobs/validate_bigdata_stack.ps1` : Script PowerShell para validar que el stack está arriba.
 
+### Validaciones dentro de Docker
+
+Las comprobaciones y scripts de validación están pensadas para ejecutarse dentro de los contenedores del stack (no sólo en la máquina host). Por ejemplo:
+
+- `docker exec namenode ...` se usa para ejecutar comandos HDFS dentro del contenedor `namenode`.
+- `docker exec spark-master ...` o `docker exec spark-worker ...` se usan para ejecutar comprobaciones o jobs Spark dentro de los contenedores Spark.
+
+El script `docker/spark-jobs/validate_bigdata_stack.ps1` realiza checks desde el host pero asume que los servicios están disponibles dentro de Docker; en pipelines de Jenkins lo normal es ejecutar validaciones con `docker exec` para comprobar conectividad HDFS, disponibilidad del Namenode/Datanode y la capacidad de ejecutar `spark-submit`.
+
 - `jenkins/cleandata/` y `jenkins/uperdata/` : pipelines y scripts asociados a cada pipeline en Jenkins.
   - `jenkins/uperdata/scritps/update_dataset_hdfs.sh` : script que copia los CSV desde el workspace al HDFS (`/raw`).
     - Comportamiento clave:
@@ -95,6 +104,21 @@ Zonas de datos sugeridas:
 	 - Valida existencia en HDFS con `hdfs dfs -test -f`.
 	 - Al final lista el contenido de la ruta HDFS.
     - Recomendaciones: parametrizar `WORKSPACE` y `HDFS_PATH`, limpiar `/tmp` en el contenedor, añadir `--help` y comprobaciones previas de `docker` y `docker exec`.
+
+## Rol de Hadoop (HDFS) y Spark en el proceso
+
+- Hadoop/HDFS: actúa como la zona de almacenamiento distribuido. Los CSV crudos se colocan en la zona `raw` (ej. `/raw`) para mantener un registro inmutable de los datos originales. HDFS permite a Spark leer los datos de forma distribuida y escalable.
+- Spark: se encarga de la validación, limpieza y transformación de los datos. Los jobs Spark (por ejemplo `validate_raw.py`, `clean_orders.py`) realizan:
+	- Validaciones de consistencia y esquema.
+	- Transformaciones y limpieza (convertir tipos, normalizar, quitar duplicados).
+	- Escritura de resultados en zonas `bronze`/`gold` en HDFS y/o exportación a PostgreSQL para consumo analítico.
+
+Flujo típico con Docker:
+
+1. `update_dataset_hdfs.sh` copia los CSV al contenedor `namenode` y los pone en HDFS (`/raw`).
+2. Se ejecuta un job de validación dentro de un contenedor Spark (ej. `docker exec spark-worker spark-submit ... validate_raw.py`) que lee desde HDFS.
+3. Si la validación pasa, se ejecutan jobs de limpieza/transformación que escriben en `/bronze` y luego `/gold`.
+4. Los resultados finales pueden exportarse a PostgreSQL y visualizarse en Metabase.
 
   - `jenkins/cleandata/spark-jobs/clean_customers.py`, `clean_orders.py`, `gold_orders.py` : jobs Spark para limpieza y promoción a gold.
   - `jenkins/uperdata/scritps/create_directories_hdfs.sh` y `update_dataset_hdfs.sh` : helpers para preparar HDFS y subir datos.
